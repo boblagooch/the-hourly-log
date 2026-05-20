@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1A3D36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="The Hourly Log">
+  <title>The Hourly Log</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:        #F4F9F7;
+      --cream-dark:   #E5EFEA;
+      --warm-white:   #F8FDFB;
+      --wood-light:   #8DBDB0;
+      --wood-mid:     #3D7A6C;
+      --wood-dark:    #1A3D36;
+      --amber:        #C9A84C;
+      --amber-light:  #DFC878;
+      --sage:         #5E9B84;
+      --sage-light:   #9EC8B8;
+      --sage-dark:    #3D7060;
+      --warm-gray:    #537878;
+      --text-primary: #182E28;
+      --text-sec:     #3A5550;
+      --text-muted:   #617A75;
+      --border:       #BEDAD3;
+      --border-focus: #3D7A6C;
+      --error:        #C45C4A;
+      --success:      #3D7060;
+
+      --font-serif: 'DM Serif Display', Georgia, serif;
+      --font-sans:  'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --r-sm: 8px;
+      --r-md: 12px;
+      --shadow-sm: 0 1px 3px rgba(26,61,54,0.08);
+      --shadow-md: 0 4px 12px rgba(26,61,54,0.1);
+      --shadow-lg: 0 8px 24px rgba(26,61,54,0.14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Splash ─────────────────────────────── */
+    #splash {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--wood-dark);
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      z-index: 9999;
+      -webkit-animation: splashOut 0.55s ease 1.9s forwards;
+      animation: splashOut 0.55s ease 1.9s forwards;
+    }
+
+    @-webkit-keyframes splashOut { to { opacity: 0; pointer-events: none; } }
+    @keyframes splashOut         { to { opacity: 0; pointer-events: none; } }
+
+    .splash-inner { text-align: center; padding: 2rem; }
+
+    .splash-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--amber);
+      margin: 0 auto 1.5rem;
+    }
+
+    .splash-title {
+      font-family: var(--font-serif);
+      font-size: 2.25rem;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.6rem;
+    }
+
+    .splash-sub {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      color: var(--wood-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    /* ── App shell ───────────────────────────── */
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--warm-white);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .app-header {
+      background: var(--wood-dark);
+      padding: 2rem 1.5rem 1.375rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .app-title {
+      font-family: var(--font-serif);
+      font-size: 1.625rem;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    .app-subtitle {
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      color: var(--wood-light);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Back button ─────────────────────────── */
+    .back-btn {
+      position: absolute;
+      top: 50%;
+      left: 0.75rem;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--wood-light);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.5rem 0.625rem;
+      min-height: 44px;
+      min-width: 44px;
+      display: none;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      gap: 0.2rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-btn.visible { display: -webkit-box; display: -ms-flexbox; display: flex; }
+    .back-btn:active { opacity: 0.65; }
+
+    /* ── Content / screens ───────────────────── */
+    .content {
+      padding: 1.5rem;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Intake landing ──────────────────────── */
+    .intake-prompt {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 1.375rem;
+      line-height: 1.3;
+    }
+
+    .intake-grid {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    .intake-card {
+      background: var(--warm-white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 1.125rem 1.25rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      gap: 1rem;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 72px;
+    }
+
+    .intake-card:active {
+      border-color: var(--wood-mid);
+      box-shadow: var(--shadow-md);
+      background: var(--cream-dark);
+    }
+
+    .intake-card-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 10px;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .icon-shoutout    { background: var(--amber); }
+    .icon-shift       { background: var(--sage); }
+    .icon-suggestion  { background: var(--wood-mid); }
+    .icon-concern     { background: #B84A30; }
+
+    .intake-card-text h3 {
+      font-family: var(--font-sans);
+      font-size: 0.975rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.15rem;
+    }
+
+    .intake-card-text p {
+      font-size: 0.785rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* ── Form primitives ─────────────────────── */
+    .form-section { margin-bottom: 1.375rem; }
+
+    .form-label {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      display: block;
+      line-height: 1.4;
+    }
+
+    .form-sublabel {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 0.175rem;
+      display: block;
+      line-height: 1.4;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      color: var(--text-primary);
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      -webkit-transition: border-color 0.18s;
+      transition: border-color 0.18s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background: var(--warm-white);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .form-textarea.short { min-height: 80px; }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233A5550' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+
+    .char-counter.warn   { color: var(--amber); }
+    .char-counter.danger { color: var(--error); }
+
+    /* ── Mood selector ───────────────────────── */
+    .mood-row {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .mood-btn {
+      -webkit-box-flex: 1;
+      -ms-flex: 1 0 auto;
+      flex: 1 0 auto;
+      min-width: 70px;
+      min-height: 44px;
+      touch-action: manipulation;
+      padding: 0.575rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-sec);
+      cursor: pointer;
+      text-align: center;
+      -webkit-transition: background 0.15s, color 0.15s, border-color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mood-btn:active { opacity: 0.75; }
+
+    .mood-btn.selected {
+      background: var(--wood-dark);
+      color: var(--cream);
+      border-color: var(--wood-dark);
+    }
+
+    /* ── Option buttons (concern steps) ─────── */
+    .option-col {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .option-btn {
+      width: 100%;
+      min-height: 52px;
+      touch-action: manipulation;
+      padding: 0.875rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-sec);
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.35;
+      -webkit-transition: background 0.15s, color 0.15s, border-color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-btn:active { opacity: 0.75; }
+
+    .option-btn.selected {
+      background: var(--wood-dark);
+      color: var(--cream);
+      border-color: var(--wood-dark);
+    }
+
+    /* ── Toggle switch ───────────────────────── */
+    .toggle-row {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+      justify-content: space-between;
+      min-height: 52px;
+      padding: 0.5rem 0;
+    }
+
+    .toggle-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      -webkit-box-flex: 1;
+      -ms-flex: 1;
+      flex: 1;
+      padding-right: 1rem;
+      line-height: 1.3;
+    }
+
+    .toggle-track {
+      position: relative;
+      width: 52px;
+      min-width: 52px;
+      height: 30px;
+      background: var(--border);
+      border-radius: 15px;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-transition: background 0.22s;
+      transition: background 0.22s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .toggle-track.on { background: var(--sage); }
+
+    .toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+      -webkit-transition: -webkit-transform 0.22s;
+      transition: transform 0.22s;
+      pointer-events: none;
+    }
+
+    .toggle-track.on .toggle-knob {
+      -webkit-transform: translateX(22px);
+      transform: translateX(22px);
+    }
+
+    /* ── Divider ─────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.375rem 0;
+    }
+
+    /* ── Contact fields (concern screen) ─────── */
+    .contact-fields { display: none; margin-top: 0.75rem; }
+    .contact-fields.open { display: block; }
+    .contact-stack { display: -webkit-box; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -ms-flex-direction: column; flex-direction: column; gap: 0.75rem; }
+
+    /* ── Step reveal animation ───────────────── */
+    .step-block { display: none; }
+    .step-block.open {
+      display: block;
+      -webkit-animation: slideIn 0.22s ease;
+      animation: slideIn 0.22s ease;
+    }
+
+    @-webkit-keyframes slideIn {
+      from { opacity: 0; -webkit-transform: translateY(-6px); transform: translateY(-6px); }
+      to   { opacity: 1; -webkit-transform: translateY(0);    transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Submit button ───────────────────────── */
+    .submit-btn {
+      width: 100%;
+      min-height: 52px;
+      padding: 1rem;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+      background: var(--wood-dark);
+      border: none;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-transition: opacity 0.18s;
+      transition: opacity 0.18s;
+      margin-top: 1.375rem;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+
+    .submit-btn:active  { opacity: 0.82; }
+    .submit-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+    .submit-btn.loading  { color: transparent; }
+
+    .submit-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      left: 50%;
+      margin-top: -10px;
+      margin-left: -10px;
+      border: 2px solid transparent;
+      border-top-color: var(--cream);
+      border-radius: 50%;
+      -webkit-animation: spin 0.75s linear infinite;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @-webkit-keyframes spin { to { -webkit-transform: rotate(360deg); transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Thank you screen ────────────────────── */
+    .thankyou {
+      text-align: center;
+      padding: 3rem 1rem 2.5rem;
+    }
+
+    .thankyou-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--sage-light);
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .thankyou-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--sage-dark);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .thankyou h2 {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      margin-bottom: 0.625rem;
+    }
+
+    .thankyou p {
+      font-size: 0.9rem;
+      color: var(--text-sec);
+      line-height: 1.6;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .restart-btn {
+      display: inline-block;
+      touch-action: manipulation;
+      margin-top: 2rem;
+      padding: 0.75rem 1.5rem;
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--wood-mid);
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 44px;
+    }
+
+    .restart-btn:active { background: var(--cream); }
+
+    /* ── Status toast ────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      -webkit-transform: translateX(-50%);
+      transform: translateX(-50%);
+      padding: 0.45rem 1.1rem;
+      border-radius: 20px;
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      -webkit-transition: opacity 0.28s;
+      transition: opacity 0.28s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show { opacity: 1; }
+    .toast.online  { background: var(--success); color: #fff; }
+    .toast.offline { background: var(--error);   color: #fff; }
+    .toast.saving  { background: var(--amber);   color: var(--wood-dark); }
+
+    /* ── Fine print ──────────────────────────── */
+    .fine-print {
+      margin-top: 1.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    /* ── Responsive ──────────────────────────── */
+    @media (max-width: 480px) {
+      .app { box-shadow: none; }
+    }
+
+    @media (min-width: 481px) {
+      body { padding: 1rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ Splash ════════════════════════════════════════ -->
+<div id="splash" role="presentation" aria-hidden="true">
+  <div class="splash-inner">
+    <div class="splash-rule"></div>
+    <h1 class="splash-title">The Hourly Log</h1>
+    <p class="splash-sub">Staff Feedback</p>
+  </div>
+</div>
+
+<!-- ══ App ═══════════════════════════════════════════ -->
+<div class="app">
+
+  <header class="app-header">
+    <button class="back-btn" id="backBtn" type="button" aria-label="Go back">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M10 12L6 8l4-4"/>
+      </svg>
+      Back
+    </button>
+    <h1 class="app-title">The Hourly Log</h1>
+    <p class="app-subtitle">Staff Feedback</p>
+  </header>
+
+  <div class="content">
+
+    <!-- ── Intake landing ──────────────────────────── -->
+    <div class="screen active" id="screen-intake">
+      <p class="intake-prompt">What brings you here?</p>
+      <div class="intake-grid">
+
+        <div class="intake-card" data-target="shoutout" role="button" tabindex="0"
+             aria-label="Give a Shout-Out">
+          <div class="intake-card-icon icon-shoutout" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.3L10 14.5l-4.9 2.5.9-5.3-4-3.9 5.6-.8z"/>
+            </svg>
+          </div>
+          <div class="intake-card-text">
+            <h3>Give a Shout-Out</h3>
+            <p>Recognize a teammate for something they did well</p>
+          </div>
+        </div>
+
+        <div class="intake-card" data-target="shift" role="button" tabindex="0"
+             aria-label="Share Your Shift">
+          <div class="intake-card-icon icon-shift" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round">
+              <circle cx="10" cy="10" r="8"/>
+              <path d="M10 6v4l2.5 2.5"/>
+            </svg>
+          </div>
+          <div class="intake-card-text">
+            <h3>Share Your Shift</h3>
+            <p>Check in about how your shift went</p>
+          </div>
+        </div>
+
+        <div class="intake-card" data-target="suggestion" role="button" tabindex="0"
+             aria-label="Suggestions for Improvement">
+          <div class="intake-card-icon icon-suggestion" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round">
+              <path d="M10 2a5.5 5.5 0 013 10.1V14a1 1 0 01-1 1H8a1 1 0 01-1-1v-1.9A5.5 5.5 0 0110 2z"/>
+              <path d="M8 17h4"/>
+            </svg>
+          </div>
+          <div class="intake-card-text">
+            <h3>Suggestions for Improvement</h3>
+            <p>Share an idea to make things better</p>
+          </div>
+        </div>
+
+        <div class="intake-card" data-target="concern" role="button" tabindex="0"
+             aria-label="Workplace Concern">
+          <div class="intake-card-icon icon-concern" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round">
+              <path d="M18 15H2l8-13z"/>
+              <path d="M10 9v2"/>
+              <circle cx="10" cy="13.5" r="0.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="intake-card-text">
+            <h3>Workplace Concern</h3>
+            <p>Report an issue or raise a concern</p>
+          </div>
+        </div>
+
+      </div>
+      <p class="fine-print">
+        Submissions are confidential and reviewed by management.<br>
+        Providing your name is always optional.
+      </p>
+    </div>
+
+    <!-- ── Give a Shout-Out ────────────────────────── -->
+    <div class="screen" id="screen-shoutout">
+
+      <div class="form-section">
+        <label class="form-label" for="shoutoutWho">Who would you like to recognize?</label>
+        <input class="form-input" type="text" id="shoutoutWho" maxlength="100" autocomplete="off">
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="shoutoutWhat">What did they do that stood out?</label>
+        <textarea class="form-textarea" id="shoutoutWhat" maxlength="500"></textarea>
+        <div class="char-counter" id="shoutoutWhatCount">0 / 500</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="form-section">
+        <label class="form-label" for="shoutoutName">
+          Would you like to leave your name?
+          <span class="form-sublabel">Optional</span>
+        </label>
+        <input class="form-input" type="text" id="shoutoutName" autocomplete="name">
+      </div>
+
+      <button class="submit-btn" id="shoutoutSubmit" type="button" disabled>Submit</button>
+    </div>
+
+    <!-- ── Share Your Shift ───────────────────────── -->
+    <div class="screen" id="screen-shift">
+
+      <div class="form-section">
+        <label class="form-label">How did your shift go today?</label>
+        <div class="mood-row" id="moodGrid">
+          <button class="mood-btn" data-mood="great"    type="button">Great</button>
+          <button class="mood-btn" data-mood="good"     type="button">Good</button>
+          <button class="mood-btn" data-mood="okay"     type="button">Okay</button>
+          <button class="mood-btn" data-mood="rough"    type="button">Rough</button>
+          <button class="mood-btn" data-mood="terrible" type="button">Terrible</button>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="shiftNotes">
+          Anything worth noting from your shift?
+          <span class="form-sublabel">Optional</span>
+        </label>
+        <textarea class="form-textarea" id="shiftNotes" maxlength="500"></textarea>
+        <div class="char-counter" id="shiftNotesCount">0 / 500</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="form-section">
+        <div class="toggle-row">
+          <span class="toggle-label">Give someone a shout-out?</span>
+          <div class="toggle-track" id="shoutoutToggle" role="switch"
+               aria-checked="false" tabindex="0">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+        <div id="shoutoutToggleField" style="display:none;">
+          <textarea class="form-textarea short" id="shiftShoutout" maxlength="300"
+                    placeholder="Who, and what did they do?"></textarea>
+          <div class="char-counter" id="shiftShoutoutCount">0 / 300</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="shiftName">
+          Would you like to leave your name?
+          <span class="form-sublabel">Optional — only if you'd like to be contacted about your submission.</span>
+        </label>
+        <input class="form-input" type="text" id="shiftName" autocomplete="name">
+      </div>
+
+      <button class="submit-btn" id="shiftSubmit" type="button" disabled>Submit</button>
+    </div>
+
+    <!-- ── Suggestions for Improvement ──────────────── -->
+    <div class="screen" id="screen-suggestion">
+
+      <div class="form-section">
+        <label class="form-label" for="suggestionArea">
+          What area does your suggestion relate to?
+        </label>
+        <select class="form-select" id="suggestionArea">
+          <option value="" disabled selected>Select an area</option>
+          <option value="kitchen">Kitchen / Food</option>
+          <option value="foh">Front of House / Service</option>
+          <option value="operations">Operations / Systems</option>
+          <option value="scheduling">Scheduling</option>
+          <option value="training">Training</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="suggestionText">What's your suggestion?</label>
+        <textarea class="form-textarea" id="suggestionText" maxlength="500"></textarea>
+        <div class="char-counter" id="suggestionTextCount">0 / 500</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="form-section">
+        <label class="form-label" for="suggestionName">
+          Would you like to leave your name?
+          <span class="form-sublabel">Optional — only if you'd like to be contacted about your submission.</span>
+        </label>
+        <input class="form-input" type="text" id="suggestionName" autocomplete="name">
+      </div>
+
+      <button class="submit-btn" id="suggestionSubmit" type="button" disabled>Submit</button>
+    </div>
+
+    <!-- ── Workplace Concern ──────────────────────── -->
+    <div class="screen" id="screen-concern">
+
+      <!-- Step 1: Type — always visible -->
+      <div class="form-section">
+        <label class="form-label">What type of concern are you sharing?</label>
+        <div class="option-col" id="concernTypeGrid">
+          <button class="option-btn" data-value="interpersonal"  type="button">Interpersonal conflict (with a coworker or manager)</button>
+          <button class="option-btn" data-value="harassment"     type="button">Harassment or discrimination</button>
+          <button class="option-btn" data-value="scheduling-pay" type="button">Scheduling or pay issue</button>
+          <button class="option-btn" data-value="safety"         type="button">Safety concern</button>
+          <button class="option-btn" data-value="policy"         type="button">Policy or procedure issue</button>
+          <button class="option-btn" data-value="other"          type="button">Other</button>
+        </div>
+      </div>
+
+      <!-- Step 2: One-time or ongoing — revealed after type -->
+      <div class="step-block" id="concernStep2">
+        <div class="form-section">
+          <label class="form-label">
+            Is this something that has happened once, or has it been an ongoing pattern?
+          </label>
+          <div class="option-col" id="concernPatternGrid">
+            <button class="option-btn" data-value="one-time" type="button">This is a one-time incident</button>
+            <button class="option-btn" data-value="pattern"  type="button">This has happened multiple times</button>
+            <button class="option-btn" data-value="unsure"   type="button">I'm not sure</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Details — revealed after pattern -->
+      <div class="step-block" id="concernStep3">
+        <div class="form-section">
+          <label class="form-label" for="concernWhen">
+            When did this happen?
+            <span class="form-sublabel">Optional</span>
+          </label>
+          <input class="form-input" type="text" id="concernWhen" autocomplete="off">
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="concernWho">
+            Who was involved?
+            <span class="form-sublabel">Optional</span>
+          </label>
+          <input class="form-input" type="text" id="concernWho" autocomplete="off">
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="concernWhat">
+            What happened?
+            <span class="form-sublabel">Optional</span>
+          </label>
+          <textarea class="form-textarea" id="concernWhat" maxlength="1000"></textarea>
+          <div class="char-counter" id="concernWhatCount">0 / 1000</div>
+        </div>
+      </div>
+
+      <!-- Step 4: Contact — revealed after pattern -->
+      <div class="step-block" id="concernStep4">
+        <hr class="divider">
+        <div class="form-section">
+          <label class="form-label">Would you like us to contact you about this concern?</label>
+          <div class="option-col" id="concernContactGrid">
+            <button class="option-btn" data-value="yes" type="button">Yes, I'd like to be contacted</button>
+            <button class="option-btn" data-value="no"  type="button">No, I'd prefer to stay anonymous</button>
+          </div>
+
+          <div class="contact-fields" id="concernContactFields">
+            <div class="contact-stack">
+              <div>
+                <label class="form-label" for="concernName">Your name</label>
+                <input class="form-input" type="text" id="concernName" autocomplete="name">
+              </div>
+              <div>
+                <label class="form-label" for="concernContactInfo">
+                  Best way to reach you
+                  <span class="form-sublabel">Phone number or email</span>
+                </label>
+                <input class="form-input" type="text" id="concernContactInfo" autocomplete="email">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit-btn" id="concernSubmit" type="button" disabled>Submit</button>
+      </div>
+
+    </div>
+
+    <!-- ── Thank You ──────────────────────────────── -->
+    <div class="screen" id="screen-thankyou">
+      <div class="thankyou">
+        <div class="thankyou-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h2>Thank you.</h2>
+        <p id="thankYouMsg">Your submission has been received.</p>
+        <button class="restart-btn" id="restartBtn" type="button">Submit another</button>
+      </div>
+    </div>
+
+  </div><!-- .content -->
+</div><!-- .app -->
+
+<!-- Status toast -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastText"></span>
+</div>
+
+<!-- Firebase compat SDK (9.x, no module syntax needed) -->
+<!-- Remove splash from DOM after CSS animation completes (1.9s delay + 0.55s fade) -->
+<script>
+  setTimeout(function() {
+    var s = document.getElementById('splash');
+    if (s) { s.style.display = 'none'; }
+  }, 2600);
+</script>
+
+<!-- defer: downloads in parallel, executes in order, does NOT block DOMContentLoaded -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+
+<script>
+  /* ═══════════════════════════════════════════════
+     FIREBASE — lazy init, called only at save time
+  ═══════════════════════════════════════════════ */
+  var firebaseConfig = {
+    apiKey:            "AIzaSyAlHgOqWmanxs1a1cgjj5zfKJJRK0gxEDE",
+    authDomain:        "the-hourly-log.firebaseapp.com",
+    projectId:         "the-hourly-log",
+    storageBucket:     "the-hourly-log.firebasestorage.app",
+    messagingSenderId: "634486351257",
+    appId:             "1:634486351257:web:8d19c3a3e497c4ace7df08"
+  };
+
+  var db = null;
+  var fbReady = false;
+
+  function ensureFirebase() {
+    if (fbReady) return;
+    if (typeof firebase === 'undefined') return;
+    if (typeof firebase.firestore !== 'function') return;
+    try {
+      if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+      db = firebase.firestore();
+      fbReady = true;
+    } catch (e) {
+      console.warn('Firebase init failed:', e);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════
+     NAVIGATION STATE
+  ═══════════════════════════════════════════════ */
+  var currentScreen = 'intake';
+  var navStack = [];
+
+  /* ═══════════════════════════════════════════════
+     FORM STATE
+  ═══════════════════════════════════════════════ */
+  var concernData = { type: null, pattern: null, contact: null };
+
+  /* ═══════════════════════════════════════════════
+     DOM HELPER
+  ═══════════════════════════════════════════════ */
+  function $el(id) { return document.getElementById(id); }
+
+  /* ═══════════════════════════════════════════════
+     SCREEN MANAGEMENT
+  ═══════════════════════════════════════════════ */
+  function showScreen(name) {
+    var screens = document.querySelectorAll('.screen');
+    Array.prototype.forEach.call(screens, function(s) {
+      s.classList.remove('active');
+    });
+    $el('screen-' + name).classList.add('active');
+
+    var backBtn = $el('backBtn');
+    if (name === 'intake' || name === 'thankyou') {
+      backBtn.classList.remove('visible');
+    } else {
+      backBtn.classList.add('visible');
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  function navigateTo(name) {
+    navStack.push(currentScreen);
+    currentScreen = name;
+    showScreen(name);
+  }
+
+  function goBack() {
+    if (navStack.length === 0) return;
+    currentScreen = navStack.pop();
+    showScreen(currentScreen);
+  }
+
+  /* ═══════════════════════════════════════════════
+     TOAST
+  ═══════════════════════════════════════════════ */
+  var toastTimer = null;
+
+  function showToast(type, msg) {
+    var el = $el('toast');
+    $el('toastText').textContent = msg;
+    el.className = 'toast ' + type + ' show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() {
+      el.classList.remove('show');
+    }, 3000);
+  }
+
+  /* ═══════════════════════════════════════════════
+     CHAR COUNTER
+  ═══════════════════════════════════════════════ */
+  function bindCharCounter(textareaId, counterId) {
+    var ta = $el(textareaId);
+    var ct = $el(counterId);
+    if (!ta || !ct) return;
+    ta.addEventListener('input', function() {
+      var len = ta.value.length;
+      var max = parseInt(ta.getAttribute('maxlength'), 10);
+      ct.textContent = len + ' / ' + max;
+      ct.className = 'char-counter';
+      if (len > max * 0.9)      { ct.className = 'char-counter danger'; }
+      else if (len > max * 0.7) { ct.className = 'char-counter warn';   }
+    });
+  }
+
+  /* ═══════════════════════════════════════════════
+     DATA SAVE
+  ═══════════════════════════════════════════════ */
+  function saveSubmission(category, fields) {
+    ensureFirebase();
+    var submission = { category: category, timestamp: new Date().toISOString() };
+    var k;
+    for (k in fields) {
+      if (fields.hasOwnProperty(k)) { submission[k] = fields[k]; }
+    }
+
+    showToast('saving', 'Saving…');
+
+    if (fbReady && db) {
+      return db.collection('submissions').add(submission)
+        .then(function() {
+          showToast('online', 'Saved');
+          return true;
+        })
+        ['catch'](function(err) {
+          console.warn('Firestore save failed:', err);
+          return saveLocalFallback(submission);
+        });
+    }
+    return Promise.resolve(saveLocalFallback(submission));
+  }
+
+  function saveLocalFallback(submission) {
+    try {
+      var raw = localStorage.getItem('thl_submissions') || '[]';
+      var list = JSON.parse(raw);
+      list.push(submission);
+      localStorage.setItem('thl_submissions', JSON.stringify(list));
+      showToast('offline', 'Saved locally');
+      return true;
+    } catch (e) {
+      showToast('offline', 'Save failed — please try again');
+      return false;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════
+     RESET ALL FORMS
+  ═══════════════════════════════════════════════ */
+  function resetAllForms() {
+    var i, btns;
+
+    /* Shout-Out */
+    $el('shoutoutWho').value  = '';
+    $el('shoutoutWhat').value = '';
+    $el('shoutoutName').value = '';
+    $el('shoutoutWhatCount').textContent = '0 / 500';
+    $el('shoutoutWhatCount').className   = 'char-counter';
+    resetBtn($el('shoutoutSubmit'), true);
+
+    /* Shift */
+    btns = document.querySelectorAll('#moodGrid .mood-btn');
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+    $el('shiftNotes').value    = '';
+    $el('shiftNotesCount').textContent = '0 / 500';
+    $el('shiftNotesCount').className   = 'char-counter';
+    var track = $el('shoutoutToggle');
+    track.classList.remove('on');
+    track.setAttribute('aria-checked', 'false');
+    $el('shoutoutToggleField').style.display = 'none';
+    $el('shiftShoutout').value  = '';
+    $el('shiftShoutoutCount').textContent = '0 / 300';
+    $el('shiftShoutoutCount').className   = 'char-counter';
+    $el('shiftName').value = '';
+    resetBtn($el('shiftSubmit'), true);
+
+    /* Suggestion */
+    $el('suggestionArea').selectedIndex = 0;
+    $el('suggestionText').value = '';
+    $el('suggestionTextCount').textContent = '0 / 500';
+    $el('suggestionTextCount').className   = 'char-counter';
+    $el('suggestionName').value = '';
+    resetBtn($el('suggestionSubmit'), true);
+
+    /* Concern */
+    btns = document.querySelectorAll('#concernTypeGrid .option-btn');
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+    btns = document.querySelectorAll('#concernPatternGrid .option-btn');
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+    btns = document.querySelectorAll('#concernContactGrid .option-btn');
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+
+    $el('concernStep2').className = 'step-block';
+    $el('concernStep3').className = 'step-block';
+    $el('concernStep4').className = 'step-block';
+    $el('concernContactFields').classList.remove('open');
+    $el('concernWhen').value = '';
+    $el('concernWho').value  = '';
+    $el('concernWhat').value = '';
+    $el('concernWhatCount').textContent = '0 / 1000';
+    $el('concernWhatCount').className   = 'char-counter';
+    $el('concernName').value        = '';
+    $el('concernContactInfo').value = '';
+    resetBtn($el('concernSubmit'), true);
+
+    concernData.type    = null;
+    concernData.pattern = null;
+    concernData.contact = null;
+  }
+
+  function resetBtn(btn, disable) {
+    btn.disabled = disable;
+    btn.classList.remove('loading');
+    btn.textContent = 'Submit';
+  }
+
+  /* ═══════════════════════════════════════════════
+     CONCERN: reveal a step block with animation
+  ═══════════════════════════════════════════════ */
+  function openStep(stepEl) {
+    stepEl.className = 'step-block open';
+    setTimeout(function() {
+      try {
+        stepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        stepEl.scrollIntoView(true);
+      }
+    }, 80);
+  }
+
+  /* ═══════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════ */
+  function initApp() {
+
+    /* ── Char counters ── */
+    bindCharCounter('shoutoutWhat',  'shoutoutWhatCount');
+    bindCharCounter('shiftNotes',    'shiftNotesCount');
+    bindCharCounter('shiftShoutout', 'shiftShoutoutCount');
+    bindCharCounter('suggestionText','suggestionTextCount');
+    bindCharCounter('concernWhat',   'concernWhatCount');
+
+    /* ── Back button ── */
+    $el('backBtn').addEventListener('click', goBack);
+
+    /* ── Intake cards ── */
+    var cards = document.querySelectorAll('.intake-card');
+    Array.prototype.forEach.call(cards, function(card) {
+      function activate() { navigateTo(card.getAttribute('data-target')); }
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      });
+    });
+
+    /* ══════════════════════════════════════════
+       GIVE A SHOUT-OUT
+    ══════════════════════════════════════════ */
+    function checkShoutout() {
+      var who  = $el('shoutoutWho').value.trim();
+      var what = $el('shoutoutWhat').value.trim();
+      $el('shoutoutSubmit').disabled = !(who && what);
+    }
+
+    $el('shoutoutWho').addEventListener('input',  checkShoutout);
+    $el('shoutoutWhat').addEventListener('input', checkShoutout);
+
+    $el('shoutoutSubmit').addEventListener('click', function() {
+      var btn = this;
+      if (btn.disabled) return;
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      var data = {
+        who:  $el('shoutoutWho').value.trim(),
+        what: $el('shoutoutWhat').value.trim(),
+        name: $el('shoutoutName').value.trim()
+      };
+
+      saveSubmission('shoutout', data).then(function(ok) {
+        if (ok) {
+          $el('thankYouMsg').textContent = 'Your recognition has been shared.';
+          navigateTo('thankyou');
+        } else {
+          resetBtn(btn, false);
+          btn.textContent = 'Try again';
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════
+       SHARE YOUR SHIFT
+    ══════════════════════════════════════════ */
+    function checkShift() {
+      var sel = document.querySelector('#moodGrid .mood-btn.selected');
+      $el('shiftSubmit').disabled = !sel;
+    }
+
+    var moodBtns = document.querySelectorAll('#moodGrid .mood-btn');
+    Array.prototype.forEach.call(moodBtns, function(btn) {
+      btn.addEventListener('click', function() {
+        Array.prototype.forEach.call(moodBtns, function(b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        checkShift();
+      });
+    });
+
+    /* Shout-out toggle */
+    var toggleTrack = $el('shoutoutToggle');
+
+    function flipToggle() {
+      var isOn = toggleTrack.classList.toggle('on');
+      toggleTrack.setAttribute('aria-checked', isOn ? 'true' : 'false');
+      $el('shoutoutToggleField').style.display = isOn ? 'block' : 'none';
+      if (isOn) { $el('shiftShoutout').focus(); }
+    }
+
+    toggleTrack.addEventListener('click', flipToggle);
+    toggleTrack.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipToggle(); }
+    });
+
+    $el('shiftSubmit').addEventListener('click', function() {
+      var btn = this;
+      var sel = document.querySelector('#moodGrid .mood-btn.selected');
+      if (!sel) return;
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      var data = {
+        mood:     sel.getAttribute('data-mood'),
+        notes:    $el('shiftNotes').value.trim(),
+        shoutout: $el('shiftShoutout').value.trim(),
+        name:     $el('shiftName').value.trim()
+      };
+
+      saveSubmission('shift', data).then(function(ok) {
+        if (ok) {
+          $el('thankYouMsg').textContent = 'Your shift check-in has been received.';
+          navigateTo('thankyou');
+        } else {
+          resetBtn(btn, false);
+          btn.textContent = 'Try again';
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════
+       SUGGESTIONS FOR IMPROVEMENT
+    ══════════════════════════════════════════ */
+    function checkSuggestion() {
+      var area = $el('suggestionArea').value;
+      var text = $el('suggestionText').value.trim();
+      $el('suggestionSubmit').disabled = !(area && text);
+    }
+
+    $el('suggestionArea').addEventListener('change', checkSuggestion);
+    $el('suggestionText').addEventListener('input',  checkSuggestion);
+
+    $el('suggestionSubmit').addEventListener('click', function() {
+      var btn = this;
+      if (btn.disabled) return;
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      var data = {
+        area:       $el('suggestionArea').value,
+        suggestion: $el('suggestionText').value.trim(),
+        name:       $el('suggestionName').value.trim()
+      };
+
+      saveSubmission('suggestion', data).then(function(ok) {
+        if (ok) {
+          $el('thankYouMsg').textContent = 'Your suggestion has been received.';
+          navigateTo('thankyou');
+        } else {
+          resetBtn(btn, false);
+          btn.textContent = 'Try again';
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════
+       WORKPLACE CONCERN
+    ══════════════════════════════════════════ */
+
+    /* Step 1 — type */
+    var typeGrid = document.querySelectorAll('#concernTypeGrid .option-btn');
+    Array.prototype.forEach.call(typeGrid, function(btn) {
+      btn.addEventListener('click', function() {
+        Array.prototype.forEach.call(typeGrid, function(b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        concernData.type = btn.getAttribute('data-value');
+
+        if ($el('concernStep2').className.indexOf('open') === -1) {
+          openStep($el('concernStep2'));
+        }
+      });
+    });
+
+    /* Step 2 — pattern */
+    var patternGrid = document.querySelectorAll('#concernPatternGrid .option-btn');
+    Array.prototype.forEach.call(patternGrid, function(btn) {
+      btn.addEventListener('click', function() {
+        Array.prototype.forEach.call(patternGrid, function(b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        concernData.pattern = btn.getAttribute('data-value');
+
+        if ($el('concernStep3').className.indexOf('open') === -1) {
+          openStep($el('concernStep3'));
+        }
+        if ($el('concernStep4').className.indexOf('open') === -1) {
+          openStep($el('concernStep4'));
+        }
+        $el('concernSubmit').disabled = false;
+      });
+    });
+
+    /* Step 4 — contact preference */
+    var contactGrid = document.querySelectorAll('#concernContactGrid .option-btn');
+    Array.prototype.forEach.call(contactGrid, function(btn) {
+      btn.addEventListener('click', function() {
+        Array.prototype.forEach.call(contactGrid, function(b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        concernData.contact = btn.getAttribute('data-value');
+
+        if (btn.getAttribute('data-value') === 'yes') {
+          $el('concernContactFields').classList.add('open');
+          $el('concernName').focus();
+        } else {
+          $el('concernContactFields').classList.remove('open');
+        }
+      });
+    });
+
+    /* Submit */
+    $el('concernSubmit').addEventListener('click', function() {
+      var btn = this;
+      if (!concernData.type || !concernData.pattern) return;
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      var data = {
+        type:              concernData.type,
+        pattern:           concernData.pattern,
+        when:              $el('concernWhen').value.trim(),
+        who:               $el('concernWho').value.trim(),
+        what:              $el('concernWhat').value.trim(),
+        contactPreference: concernData.contact || 'not-answered',
+        name:              $el('concernName').value.trim(),
+        contactInfo:       $el('concernContactInfo').value.trim()
+      };
+
+      saveSubmission('concern', data).then(function(ok) {
+        if (ok) {
+          $el('thankYouMsg').textContent =
+            'Your concern has been received and will be reviewed confidentially.';
+          navigateTo('thankyou');
+        } else {
+          resetBtn(btn, false);
+          btn.textContent = 'Try again';
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════
+       THANK YOU — restart
+    ══════════════════════════════════════════ */
+    $el('restartBtn').addEventListener('click', function() {
+      resetAllForms();
+      navStack = [];
+      currentScreen = 'intake';
+      showScreen('intake');
+    });
+
+  } /* end initApp */
+
+  /* Script is at end of <body> so DOM is already parsed.
+     readyState check is a safety net for edge-case mobile browsers. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
+</script>
+</body>
+</html>
