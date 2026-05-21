@@ -962,36 +962,36 @@
           <textarea class="form-textarea" id="concernWhat" maxlength="1000" placeholder="Describe what happened in as much detail as you're comfortable sharing."></textarea>
           <div class="char-counter" id="concernWhatCount">0 / 1000</div>
         </div>
+
+        <button class="submit-btn" id="concernReadyBtn" type="button" disabled>Ready to submit?</button>
       </div>
 
-      <!-- Step 4: Contact — revealed after pattern -->
-      <div class="step-block" id="concernStep4">
-        <hr class="divider">
-        <div class="form-section">
-          <label class="form-label">Would you like us to contact you about this concern?</label>
-          <div class="option-col" id="concernContactGrid">
-            <button class="option-btn" data-value="yes" type="button" aria-pressed="false">Yes, I'd like to be contacted</button>
-            <button class="option-btn" data-value="no"  type="button" aria-pressed="false">No, I'd prefer to stay anonymous</button>
-          </div>
+    </div>
 
-          <div class="contact-fields" id="concernContactFields">
-            <div class="contact-stack">
-              <div>
-                <label class="form-label" for="concernName">Your name</label>
-                <input class="form-input" type="text" id="concernName" autocomplete="name">
-              </div>
-              <div>
-                <label class="form-label" for="concernContactInfo">
-                  Best way to reach you
-                  <span class="form-sublabel">Phone number or email</span>
-                </label>
-                <input class="form-input" type="text" id="concernContactInfo" autocomplete="email" inputmode="email">
-              </div>
-            </div>
+    <!-- ── Workplace Concern: Contact ──────────────── -->
+    <div class="screen" id="screen-concern-contact">
+
+      <p class="intake-prompt">One last thing</p>
+
+      <div class="form-section">
+        <label class="form-label">Would you like to be contacted about this concern?</label>
+        <div class="option-col" id="concernContactGrid">
+          <button class="option-btn" data-value="yes" type="button" aria-pressed="false">Yes — I'd like someone to follow up with me</button>
+          <button class="option-btn" data-value="no"  type="button" aria-pressed="false">No — I'd prefer to stay anonymous</button>
+        </div>
+        <div class="contact-fields" id="concernContactFields">
+          <div class="contact-stack">
+            <input class="form-input" type="text" id="concernName"
+                   autocomplete="name" placeholder="Your name">
+            <input class="form-input" type="text" id="concernContactInfo"
+                   autocomplete="off" inputmode="text"
+                   placeholder="Best way to reach you (text, email, etc.)">
           </div>
         </div>
+      </div>
 
-        <button class="submit-btn" id="concernSubmit" type="button" disabled>Submit Concern</button>
+      <div class="step-block" id="concernSubmitBlock">
+        <button class="submit-btn" id="concernSubmit" type="button">Submit Concern</button>
       </div>
 
     </div>
@@ -1232,16 +1232,16 @@
 
     $el('concernStep2').className = 'step-block';
     $el('concernStep3').className = 'step-block';
-    $el('concernStep4').className = 'step-block';
-    $el('concernContactFields').classList.remove('open');
+    resetBtn($el('concernReadyBtn'), true, 'Ready to submit?');
     $el('concernWhen').value = '';
     $el('concernWho').value  = '';
     $el('concernWhat').value = '';
     $el('concernWhatCount').textContent = '0 / 1000';
     $el('concernWhatCount').className   = 'char-counter';
+    $el('concernContactFields').classList.remove('open');
     $el('concernName').value        = '';
     $el('concernContactInfo').value = '';
-    resetBtn($el('concernSubmit'), true, 'Submit Concern');
+    $el('concernSubmitBlock').className = 'step-block';
 
     concernData.type    = null;
     concernData.pattern = null;
@@ -1293,22 +1293,23 @@
       Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
       btns = document.querySelectorAll('#concernPatternGrid .option-btn');
       Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
-      btns = document.querySelectorAll('#concernContactGrid .option-btn');
-      Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
       $el('concernStep2').className = 'step-block';
       $el('concernStep3').className = 'step-block';
-      $el('concernStep4').className = 'step-block';
-      $el('concernContactFields').classList.remove('open');
+      resetBtn($el('concernReadyBtn'), true, 'Ready to submit?');
       $el('concernWhen').value = '';
       $el('concernWho').value  = '';
       $el('concernWhat').value = '';
       $el('concernWhatCount').textContent = '0 / 1000';
       $el('concernWhatCount').className   = 'char-counter';
-      $el('concernName').value        = '';
-      $el('concernContactInfo').value = '';
-      resetBtn($el('concernSubmit'), true, 'Submit Concern');
       concernData.type    = null;
       concernData.pattern = null;
+    } else if (name === 'concern-contact') {
+      btns = document.querySelectorAll('#concernContactGrid .option-btn');
+      Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
+      $el('concernContactFields').classList.remove('open');
+      $el('concernName').value        = '';
+      $el('concernContactInfo').value = '';
+      $el('concernSubmitBlock').className = 'step-block';
       concernData.contact = null;
     }
   }
@@ -1514,18 +1515,16 @@
         if ($el('concernStep3').className.indexOf('open') === -1) {
           openStep($el('concernStep3'));
         }
-        if ($el('concernStep4').className.indexOf('open') === -1) {
-          setTimeout(function() {
-            openStep($el('concernStep4'));
-            $el('concernSubmit').disabled = false;
-          }, 700);
-        } else {
-          $el('concernSubmit').disabled = false;
-        }
+        $el('concernReadyBtn').disabled = false;
       });
     });
 
-    /* Step 4 — contact preference */
+    /* Ready to submit — navigate to contact screen */
+    $el('concernReadyBtn').addEventListener('click', function() {
+      navigateTo('concern-contact');
+    });
+
+    /* Contact preference (on concern-contact screen) */
     var contactGrid = document.querySelectorAll('#concernContactGrid .option-btn');
     Array.prototype.forEach.call(contactGrid, function(btn) {
       btn.addEventListener('click', function() {
@@ -1539,6 +1538,10 @@
           $el('concernName').focus();
         } else {
           $el('concernContactFields').classList.remove('open');
+        }
+
+        if ($el('concernSubmitBlock').className.indexOf('open') === -1) {
+          openStep($el('concernSubmitBlock'));
         }
       });
     });
