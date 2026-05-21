@@ -224,6 +224,13 @@
       background: var(--cream-dark);
     }
 
+    @media (hover: hover) {
+      .intake-card:hover {
+        border-color: var(--wood-light);
+        background: var(--cream);
+      }
+    }
+
     .intake-card-icon {
       width: 44px;
       height: 44px;
@@ -309,11 +316,12 @@
 
     .form-textarea {
       min-height: 100px;
-      resize: vertical;
+      resize: none;
       line-height: 1.55;
     }
 
     .form-textarea.short { min-height: 80px; }
+    #concernWhat { min-height: 160px; }
 
     .form-select {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233A5550' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
@@ -778,6 +786,8 @@
     <!-- ── Give a Shout-Out ────────────────────────── -->
     <div class="screen" id="screen-shoutout">
 
+      <p class="intake-prompt">Give a Shout-Out</p>
+
       <div class="form-section">
         <label class="form-label" for="shoutoutWho">Who would you like to recognize?</label>
         <input class="form-input" type="text" id="shoutoutWho" maxlength="100" autocomplete="off">
@@ -799,11 +809,13 @@
         <input class="form-input" type="text" id="shoutoutName" autocomplete="name">
       </div>
 
-      <button class="submit-btn" id="shoutoutSubmit" type="button" disabled>Submit</button>
+      <button class="submit-btn" id="shoutoutSubmit" type="button" disabled>Send Shout-Out</button>
     </div>
 
     <!-- ── Share Your Shift ───────────────────────── -->
     <div class="screen" id="screen-shift">
+
+      <p class="intake-prompt">Share Your Shift</p>
 
       <div class="form-section">
         <label class="form-label">How did your shift go today?</label>
@@ -850,11 +862,13 @@
         <input class="form-input" type="text" id="shiftName" autocomplete="name">
       </div>
 
-      <button class="submit-btn" id="shiftSubmit" type="button" disabled>Submit</button>
+      <button class="submit-btn" id="shiftSubmit" type="button" disabled>Share My Shift</button>
     </div>
 
     <!-- ── Suggestions for Improvement ──────────────── -->
     <div class="screen" id="screen-suggestion">
+
+      <p class="intake-prompt">Suggestions for Improvement</p>
 
       <div class="form-section">
         <label class="form-label" for="suggestionArea">
@@ -887,11 +901,13 @@
         <input class="form-input" type="text" id="suggestionName" autocomplete="name">
       </div>
 
-      <button class="submit-btn" id="suggestionSubmit" type="button" disabled>Submit</button>
+      <button class="submit-btn" id="suggestionSubmit" type="button" disabled>Submit Suggestion</button>
     </div>
 
     <!-- ── Workplace Concern ──────────────────────── -->
     <div class="screen" id="screen-concern">
+
+      <p class="intake-prompt">Workplace Concern</p>
 
       <!-- Step 1: Type — always visible -->
       <div class="form-section">
@@ -943,7 +959,7 @@
             What happened?
             <span class="form-sublabel">Optional</span>
           </label>
-          <textarea class="form-textarea" id="concernWhat" maxlength="1000"></textarea>
+          <textarea class="form-textarea" id="concernWhat" maxlength="1000" placeholder="Describe what happened in as much detail as you're comfortable sharing."></textarea>
           <div class="char-counter" id="concernWhatCount">0 / 1000</div>
         </div>
       </div>
@@ -969,13 +985,13 @@
                   Best way to reach you
                   <span class="form-sublabel">Phone number or email</span>
                 </label>
-                <input class="form-input" type="text" id="concernContactInfo" autocomplete="email">
+                <input class="form-input" type="text" id="concernContactInfo" autocomplete="email" inputmode="email">
               </div>
             </div>
           </div>
         </div>
 
-        <button class="submit-btn" id="concernSubmit" type="button" disabled>Submit</button>
+        <button class="submit-btn" id="concernSubmit" type="button" disabled>Submit Concern</button>
       </div>
 
     </div>
@@ -1175,7 +1191,7 @@
     $el('shoutoutName').value = '';
     $el('shoutoutWhatCount').textContent = '0 / 500';
     $el('shoutoutWhatCount').className   = 'char-counter';
-    resetBtn($el('shoutoutSubmit'), true);
+    resetBtn($el('shoutoutSubmit'), true, 'Send Shout-Out');
 
     /* Shift */
     btns = document.querySelectorAll('#moodGrid .mood-btn');
@@ -1191,7 +1207,7 @@
     $el('shiftShoutoutCount').textContent = '0 / 300';
     $el('shiftShoutoutCount').className   = 'char-counter';
     $el('shiftName').value = '';
-    resetBtn($el('shiftSubmit'), true);
+    resetBtn($el('shiftSubmit'), true, 'Share My Shift');
 
     /* Suggestion */
     $el('suggestionArea').selectedIndex = 0;
@@ -1199,7 +1215,7 @@
     $el('suggestionTextCount').textContent = '0 / 500';
     $el('suggestionTextCount').className   = 'char-counter';
     $el('suggestionName').value = '';
-    resetBtn($el('suggestionSubmit'), true);
+    resetBtn($el('suggestionSubmit'), true, 'Submit Suggestion');
 
     /* Concern */
     btns = document.querySelectorAll('#concernTypeGrid .option-btn');
@@ -1220,17 +1236,17 @@
     $el('concernWhatCount').className   = 'char-counter';
     $el('concernName').value        = '';
     $el('concernContactInfo').value = '';
-    resetBtn($el('concernSubmit'), true);
+    resetBtn($el('concernSubmit'), true, 'Submit Concern');
 
     concernData.type    = null;
     concernData.pattern = null;
     concernData.contact = null;
   }
 
-  function resetBtn(btn, disable) {
+  function resetBtn(btn, disable, label) {
     btn.disabled = disable;
     btn.classList.remove('loading');
-    btn.textContent = 'Submit';
+    btn.textContent = label || 'Submit';
   }
 
   /* ═══════════════════════════════════════════════
@@ -1245,6 +1261,10 @@
         stepEl.scrollIntoView(true);
       }
     }, 80);
+    setTimeout(function() {
+      var first = stepEl.querySelector('button, input, textarea, select');
+      if (first) { first.focus(); }
+    }, 150);
   }
 
   /* ═══════════════════════════════════════════════
