@@ -400,6 +400,7 @@
       cursor: pointer;
       text-align: left;
       line-height: 1.35;
+      position: relative;
       -webkit-transition: background 0.15s, color 0.15s, border-color 0.15s;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
       -webkit-tap-highlight-color: transparent;
@@ -411,6 +412,20 @@
       background: var(--wood-dark);
       color: var(--cream);
       border-color: var(--wood-dark);
+      padding-right: 2.5rem;
+    }
+
+    .option-btn.selected::after {
+      content: '\2713';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      color: var(--cream);
+      font-size: 0.9rem;
+      line-height: 1;
+      pointer-events: none;
     }
 
     /* ── Toggle switch ───────────────────────── */
@@ -483,7 +498,7 @@
 
     /* ── Contact fields (concern screen) ─────── */
     .contact-fields { display: none; margin-top: 0.75rem; }
-    .contact-fields.open { display: block; }
+    .contact-fields.open { display: block; -webkit-animation: slideIn 0.22s ease; animation: slideIn 0.22s ease; }
     .contact-stack { display: -webkit-box; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -ms-flex-direction: column; flex-direction: column; gap: 0.75rem; }
 
     /* ── Step reveal animation ───────────────── */
@@ -912,7 +927,7 @@
             When did this happen?
             <span class="form-sublabel">Optional</span>
           </label>
-          <input class="form-input" type="text" id="concernWhen" autocomplete="off">
+          <input class="form-input" type="text" id="concernWhen" autocomplete="off" placeholder="Last Tuesday, around 3pm">
         </div>
 
         <div class="form-section">
@@ -920,7 +935,7 @@
             Who was involved?
             <span class="form-sublabel">Optional</span>
           </label>
-          <input class="form-input" type="text" id="concernWho" autocomplete="off">
+          <input class="form-input" type="text" id="concernWho" autocomplete="off" placeholder="Name or role">
         </div>
 
         <div class="form-section">
@@ -1414,9 +1429,13 @@
           openStep($el('concernStep3'));
         }
         if ($el('concernStep4').className.indexOf('open') === -1) {
-          openStep($el('concernStep4'));
+          setTimeout(function() {
+            openStep($el('concernStep4'));
+            $el('concernSubmit').disabled = false;
+          }, 700);
+        } else {
+          $el('concernSubmit').disabled = false;
         }
-        $el('concernSubmit').disabled = false;
       });
     });
 
