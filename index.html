@@ -913,12 +913,12 @@
       <div class="form-section">
         <label class="form-label">What type of concern are you sharing?</label>
         <div class="option-col" id="concernTypeGrid">
-          <button class="option-btn" data-value="interpersonal"  type="button">Interpersonal conflict (with a coworker or manager)</button>
-          <button class="option-btn" data-value="harassment"     type="button">Harassment or discrimination</button>
-          <button class="option-btn" data-value="scheduling-pay" type="button">Scheduling or pay issue</button>
-          <button class="option-btn" data-value="safety"         type="button">Safety concern</button>
-          <button class="option-btn" data-value="policy"         type="button">Policy or procedure issue</button>
-          <button class="option-btn" data-value="other"          type="button">Other</button>
+          <button class="option-btn" data-value="interpersonal"  type="button" aria-pressed="false">Interpersonal conflict (with a coworker or manager)</button>
+          <button class="option-btn" data-value="harassment"     type="button" aria-pressed="false">Harassment or discrimination</button>
+          <button class="option-btn" data-value="scheduling-pay" type="button" aria-pressed="false">Scheduling or pay issue</button>
+          <button class="option-btn" data-value="safety"         type="button" aria-pressed="false">Safety concern</button>
+          <button class="option-btn" data-value="policy"         type="button" aria-pressed="false">Policy or procedure issue</button>
+          <button class="option-btn" data-value="other"          type="button" aria-pressed="false">Other</button>
         </div>
       </div>
 
@@ -929,9 +929,9 @@
             Is this something that has happened once, or has it been an ongoing pattern?
           </label>
           <div class="option-col" id="concernPatternGrid">
-            <button class="option-btn" data-value="one-time" type="button">This is a one-time incident</button>
-            <button class="option-btn" data-value="pattern"  type="button">This has happened multiple times</button>
-            <button class="option-btn" data-value="unsure"   type="button">I'm not sure</button>
+            <button class="option-btn" data-value="one-time" type="button" aria-pressed="false">This is a one-time incident</button>
+            <button class="option-btn" data-value="pattern"  type="button" aria-pressed="false">This has happened multiple times</button>
+            <button class="option-btn" data-value="unsure"   type="button" aria-pressed="false">I'm not sure</button>
           </div>
         </div>
       </div>
@@ -970,8 +970,8 @@
         <div class="form-section">
           <label class="form-label">Would you like us to contact you about this concern?</label>
           <div class="option-col" id="concernContactGrid">
-            <button class="option-btn" data-value="yes" type="button">Yes, I'd like to be contacted</button>
-            <button class="option-btn" data-value="no"  type="button">No, I'd prefer to stay anonymous</button>
+            <button class="option-btn" data-value="yes" type="button" aria-pressed="false">Yes, I'd like to be contacted</button>
+            <button class="option-btn" data-value="no"  type="button" aria-pressed="false">No, I'd prefer to stay anonymous</button>
           </div>
 
           <div class="contact-fields" id="concernContactFields">
@@ -1102,7 +1102,9 @@
 
   function goBack() {
     if (navStack.length === 0) return;
+    var leaving = currentScreen;
     currentScreen = navStack.pop();
+    resetFormByName(leaving);
     showScreen(currentScreen);
   }
 
@@ -1175,6 +1177,9 @@
       return true;
     } catch (e) {
       showToast('offline', 'Save failed — please try again');
+      setTimeout(function() {
+        showToast('offline', 'If this continues, speak to a manager directly.');
+      }, 3500);
       return false;
     }
   }
@@ -1219,11 +1224,11 @@
 
     /* Concern */
     btns = document.querySelectorAll('#concernTypeGrid .option-btn');
-    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
     btns = document.querySelectorAll('#concernPatternGrid .option-btn');
-    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
     btns = document.querySelectorAll('#concernContactGrid .option-btn');
-    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+    Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
 
     $el('concernStep2').className = 'step-block';
     $el('concernStep3').className = 'step-block';
@@ -1247,6 +1252,65 @@
     btn.disabled = disable;
     btn.classList.remove('loading');
     btn.textContent = label || 'Submit';
+  }
+
+  /* ═══════════════════════════════════════════════
+     RESET A SINGLE FORM (called on back navigation)
+  ═══════════════════════════════════════════════ */
+  function resetFormByName(name) {
+    var btns, track;
+    if (name === 'shoutout') {
+      $el('shoutoutWho').value  = '';
+      $el('shoutoutWhat').value = '';
+      $el('shoutoutName').value = '';
+      $el('shoutoutWhatCount').textContent = '0 / 500';
+      $el('shoutoutWhatCount').className   = 'char-counter';
+      resetBtn($el('shoutoutSubmit'), true, 'Send Shout-Out');
+    } else if (name === 'shift') {
+      btns = document.querySelectorAll('#moodGrid .mood-btn');
+      Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); });
+      $el('shiftNotes').value = '';
+      $el('shiftNotesCount').textContent = '0 / 500';
+      $el('shiftNotesCount').className   = 'char-counter';
+      track = $el('shoutoutToggle');
+      track.classList.remove('on');
+      track.setAttribute('aria-checked', 'false');
+      $el('shoutoutToggleField').style.display = 'none';
+      $el('shiftShoutout').value = '';
+      $el('shiftShoutoutCount').textContent = '0 / 300';
+      $el('shiftShoutoutCount').className   = 'char-counter';
+      $el('shiftName').value = '';
+      resetBtn($el('shiftSubmit'), true, 'Share My Shift');
+    } else if (name === 'suggestion') {
+      $el('suggestionArea').selectedIndex = 0;
+      $el('suggestionText').value = '';
+      $el('suggestionTextCount').textContent = '0 / 500';
+      $el('suggestionTextCount').className   = 'char-counter';
+      $el('suggestionName').value = '';
+      resetBtn($el('suggestionSubmit'), true, 'Submit Suggestion');
+    } else if (name === 'concern') {
+      btns = document.querySelectorAll('#concernTypeGrid .option-btn');
+      Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
+      btns = document.querySelectorAll('#concernPatternGrid .option-btn');
+      Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
+      btns = document.querySelectorAll('#concernContactGrid .option-btn');
+      Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
+      $el('concernStep2').className = 'step-block';
+      $el('concernStep3').className = 'step-block';
+      $el('concernStep4').className = 'step-block';
+      $el('concernContactFields').classList.remove('open');
+      $el('concernWhen').value = '';
+      $el('concernWho').value  = '';
+      $el('concernWhat').value = '';
+      $el('concernWhatCount').textContent = '0 / 1000';
+      $el('concernWhatCount').className   = 'char-counter';
+      $el('concernName').value        = '';
+      $el('concernContactInfo').value = '';
+      resetBtn($el('concernSubmit'), true, 'Submit Concern');
+      concernData.type    = null;
+      concernData.pattern = null;
+      concernData.contact = null;
+    }
   }
 
   /* ═══════════════════════════════════════════════
@@ -1427,8 +1491,9 @@
     var typeGrid = document.querySelectorAll('#concernTypeGrid .option-btn');
     Array.prototype.forEach.call(typeGrid, function(btn) {
       btn.addEventListener('click', function() {
-        Array.prototype.forEach.call(typeGrid, function(b) { b.classList.remove('selected'); });
+        Array.prototype.forEach.call(typeGrid, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
         concernData.type = btn.getAttribute('data-value');
 
         if ($el('concernStep2').className.indexOf('open') === -1) {
@@ -1441,8 +1506,9 @@
     var patternGrid = document.querySelectorAll('#concernPatternGrid .option-btn');
     Array.prototype.forEach.call(patternGrid, function(btn) {
       btn.addEventListener('click', function() {
-        Array.prototype.forEach.call(patternGrid, function(b) { b.classList.remove('selected'); });
+        Array.prototype.forEach.call(patternGrid, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
         concernData.pattern = btn.getAttribute('data-value');
 
         if ($el('concernStep3').className.indexOf('open') === -1) {
@@ -1463,8 +1529,9 @@
     var contactGrid = document.querySelectorAll('#concernContactGrid .option-btn');
     Array.prototype.forEach.call(contactGrid, function(btn) {
       btn.addEventListener('click', function() {
-        Array.prototype.forEach.call(contactGrid, function(b) { b.classList.remove('selected'); });
+        Array.prototype.forEach.call(contactGrid, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
         concernData.contact = btn.getAttribute('data-value');
 
         if (btn.getAttribute('data-value') === 'yes') {
