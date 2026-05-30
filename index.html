@@ -713,6 +713,18 @@
 
     <!-- ── Intake landing ──────────────────────────── -->
     <div class="screen active" id="screen-intake">
+
+      <div class="form-section">
+        <label class="form-label" for="locationSelect">Which location are you at?</label>
+        <select class="form-select" id="locationSelect">
+          <option value="" disabled selected>Select your location</option>
+          <option value="kachka">Kachka</option>
+          <option value="kachka-fabrika">Kachka Fabrika</option>
+          <option value="kachka-dumpling">Kachka Dumpling Bar</option>
+          <option value="kachka-distillery">Kachka Distillery</option>
+        </select>
+      </div>
+
       <p class="intake-prompt">What brings you here?</p>
       <div class="intake-grid">
 
@@ -791,6 +803,7 @@
       <div class="form-section">
         <label class="form-label" for="shoutoutWho">Who would you like to recognize?</label>
         <input class="form-input" type="text" id="shoutoutWho" maxlength="100" autocomplete="off">
+        <div class="char-counter" id="shoutoutWhoCount">0 / 100</div>
       </div>
 
       <div class="form-section">
@@ -802,11 +815,8 @@
       <hr class="divider">
 
       <div class="form-section">
-        <label class="form-label" for="shoutoutName">
-          Would you like to leave your name?
-          <span class="form-sublabel">Optional</span>
-        </label>
-        <input class="form-input" type="text" id="shoutoutName" autocomplete="name">
+        <label class="form-label" for="shoutoutName">Would you like to leave your name?</label>
+        <input class="form-input" type="text" id="shoutoutName" maxlength="100" autocomplete="name">
       </div>
 
       <button class="submit-btn" id="shoutoutSubmit" type="button" disabled>Send Shout-Out</button>
@@ -859,7 +869,7 @@
           Would you like to leave your name?
           <span class="form-sublabel">Optional — only if you'd like to be contacted about your submission.</span>
         </label>
-        <input class="form-input" type="text" id="shiftName" autocomplete="name">
+        <input class="form-input" type="text" id="shiftName" maxlength="100" autocomplete="name">
       </div>
 
       <button class="submit-btn" id="shiftSubmit" type="button" disabled>Share My Shift</button>
@@ -898,7 +908,7 @@
           Would you like to leave your name?
           <span class="form-sublabel">Optional — only if you'd like to be contacted about your submission.</span>
         </label>
-        <input class="form-input" type="text" id="suggestionName" autocomplete="name">
+        <input class="form-input" type="text" id="suggestionName" maxlength="100" autocomplete="name">
       </div>
 
       <button class="submit-btn" id="suggestionSubmit" type="button" disabled>Submit Suggestion</button>
@@ -955,15 +965,12 @@
         </div>
 
         <div class="form-section">
-          <label class="form-label" for="concernWhat">
-            What happened?
-            <span class="form-sublabel">Optional</span>
-          </label>
+          <label class="form-label" for="concernWhat">What happened? <span class="form-sublabel" style="color:var(--error);">Required</span></label>
           <textarea class="form-textarea" id="concernWhat" maxlength="1000" placeholder="Describe what happened in as much detail as you're comfortable sharing."></textarea>
           <div class="char-counter" id="concernWhatCount">0 / 1000</div>
         </div>
 
-        <button class="submit-btn" id="concernReadyBtn" type="button" disabled>Ready to submit?</button>
+        <button class="submit-btn" id="concernReadyBtn" type="button" disabled>Next step</button>
       </div>
 
     </div>
@@ -979,13 +986,16 @@
           <button class="option-btn" data-value="yes" type="button" aria-pressed="false">Yes — I'd like someone to follow up with me</button>
           <button class="option-btn" data-value="no"  type="button" aria-pressed="false">No — I'd prefer to stay anonymous</button>
         </div>
+        <!-- TODO: liability note — add asterisk + legal copy here once ready -->
         <div class="contact-fields" id="concernContactFields">
           <div class="contact-stack">
+            <label class="form-label" for="concernName">Your name</label>
             <input class="form-input" type="text" id="concernName"
-                   autocomplete="name" placeholder="Your name">
+                   maxlength="100" autocomplete="name" placeholder="Your name">
+            <label class="form-label" for="concernContactInfo">Best way to reach you</label>
             <input class="form-input" type="text" id="concernContactInfo"
-                   autocomplete="off" inputmode="text"
-                   placeholder="Best way to reach you (text, email, etc.)">
+                   maxlength="150" autocomplete="off" inputmode="text"
+                   placeholder="Text, email, etc.">
           </div>
         </div>
       </div>
@@ -1068,6 +1078,7 @@
      FORM STATE
   ═══════════════════════════════════════════════ */
   var concernData = { type: null, pattern: null, contact: null };
+  var locationValue = '';
 
   /* ═══════════════════════════════════════════════
      DOM HELPER
@@ -1190,10 +1201,16 @@
   function resetAllForms() {
     var i, btns;
 
+    /* Location */
+    locationValue = '';
+    $el('locationSelect').selectedIndex = 0;
+
     /* Shout-Out */
     $el('shoutoutWho').value  = '';
     $el('shoutoutWhat').value = '';
     $el('shoutoutName').value = '';
+    $el('shoutoutWhoCount').textContent  = '0 / 100';
+    $el('shoutoutWhoCount').className    = 'char-counter';
     $el('shoutoutWhatCount').textContent = '0 / 500';
     $el('shoutoutWhatCount').className   = 'char-counter';
     resetBtn($el('shoutoutSubmit'), true, 'Send Shout-Out');
@@ -1232,7 +1249,7 @@
 
     $el('concernStep2').className = 'step-block';
     $el('concernStep3').className = 'step-block';
-    resetBtn($el('concernReadyBtn'), true, 'Ready to submit?');
+    resetBtn($el('concernReadyBtn'), true, 'Next step');
     $el('concernWhen').value = '';
     $el('concernWho').value  = '';
     $el('concernWhat').value = '';
@@ -1263,6 +1280,8 @@
       $el('shoutoutWho').value  = '';
       $el('shoutoutWhat').value = '';
       $el('shoutoutName').value = '';
+      $el('shoutoutWhoCount').textContent  = '0 / 100';
+      $el('shoutoutWhoCount').className    = 'char-counter';
       $el('shoutoutWhatCount').textContent = '0 / 500';
       $el('shoutoutWhatCount').className   = 'char-counter';
       resetBtn($el('shoutoutSubmit'), true, 'Send Shout-Out');
@@ -1295,7 +1314,7 @@
       Array.prototype.forEach.call(btns, function(b) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
       $el('concernStep2').className = 'step-block';
       $el('concernStep3').className = 'step-block';
-      resetBtn($el('concernReadyBtn'), true, 'Ready to submit?');
+      resetBtn($el('concernReadyBtn'), true, 'Next step');
       $el('concernWhen').value = '';
       $el('concernWho').value  = '';
       $el('concernWhat').value = '';
@@ -1338,6 +1357,7 @@
   function initApp() {
 
     /* ── Char counters ── */
+    bindCharCounter('shoutoutWho',   'shoutoutWhoCount');
     bindCharCounter('shoutoutWhat',  'shoutoutWhatCount');
     bindCharCounter('shiftNotes',    'shiftNotesCount');
     bindCharCounter('shiftShoutout', 'shiftShoutoutCount');
@@ -1347,10 +1367,22 @@
     /* ── Back button ── */
     $el('backBtn').addEventListener('click', goBack);
 
+    /* ── Location select ── */
+    $el('locationSelect').addEventListener('change', function() {
+      locationValue = this.value;
+    });
+
     /* ── Intake cards ── */
     var cards = document.querySelectorAll('.intake-card');
     Array.prototype.forEach.call(cards, function(card) {
-      function activate() { navigateTo(card.getAttribute('data-target')); }
+      function activate() {
+        if (!locationValue) {
+          showToast('saving', 'Please select your location first');
+          $el('locationSelect').focus();
+          return;
+        }
+        navigateTo(card.getAttribute('data-target'));
+      }
       card.addEventListener('click', activate);
       card.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
@@ -1376,6 +1408,7 @@
       btn.disabled = true;
 
       var data = {
+        location: locationValue,
         who:  $el('shoutoutWho').value.trim(),
         what: $el('shoutoutWhat').value.trim(),
         name: $el('shoutoutName').value.trim()
@@ -1431,10 +1464,12 @@
       btn.classList.add('loading');
       btn.disabled = true;
 
+      var toggleOn = $el('shoutoutToggle').classList.contains('on');
       var data = {
+        location: locationValue,
         mood:     sel.getAttribute('data-mood'),
         notes:    $el('shiftNotes').value.trim(),
-        shoutout: $el('shiftShoutout').value.trim(),
+        shoutout: toggleOn ? $el('shiftShoutout').value.trim() : null,
         name:     $el('shiftName').value.trim()
       };
 
@@ -1468,6 +1503,7 @@
       btn.disabled = true;
 
       var data = {
+        location:   locationValue,
         area:       $el('suggestionArea').value,
         suggestion: $el('suggestionText').value.trim(),
         name:       $el('suggestionName').value.trim()
@@ -1504,6 +1540,12 @@
     });
 
     /* Step 2 — pattern */
+    function checkConcernReady() {
+      $el('concernReadyBtn').disabled = !(concernData.pattern && $el('concernWhat').value.trim());
+    }
+
+    $el('concernWhat').addEventListener('input', checkConcernReady);
+
     var patternGrid = document.querySelectorAll('#concernPatternGrid .option-btn');
     Array.prototype.forEach.call(patternGrid, function(btn) {
       btn.addEventListener('click', function() {
@@ -1515,7 +1557,7 @@
         if ($el('concernStep3').className.indexOf('open') === -1) {
           openStep($el('concernStep3'));
         }
-        $el('concernReadyBtn').disabled = false;
+        checkConcernReady();
       });
     });
 
@@ -1554,6 +1596,7 @@
       btn.disabled = true;
 
       var data = {
+        location:          locationValue,
         type:              concernData.type,
         pattern:           concernData.pattern,
         when:              $el('concernWhen').value.trim(),
