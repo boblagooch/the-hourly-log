@@ -616,6 +616,13 @@
       <button class="filter-btn"        data-filter="suggestion" type="button">Suggestions</button>
       <button class="filter-btn"        data-filter="concern"    type="button">Concerns</button>
     </div>
+    <div class="filter-row" id="locationFilterRow">
+      <button class="filter-btn active" data-location="all"                type="button">All Locations</button>
+      <button class="filter-btn"        data-location="kachka"             type="button">Kachka</button>
+      <button class="filter-btn"        data-location="kachka-fabrika"     type="button">Fabrika</button>
+      <button class="filter-btn"        data-location="kachka-dumpling"    type="button">Dumpling Bar</button>
+      <button class="filter-btn"        data-location="kachka-distillery"  type="button">Distillery</button>
+    </div>
 
     <div class="feed" id="feed"></div>
   </div>
@@ -690,6 +697,13 @@
     suggestion: 'Suggestion', concern: 'Workplace Concern'
   };
 
+  var LOCATION_LABELS = {
+    'kachka':             'Kachka',
+    'kachka-fabrika':     'Kachka Fabrika',
+    'kachka-dumpling':    'Kachka Dumpling Bar',
+    'kachka-distillery':  'Kachka Distillery'
+  };
+
   var CAT_ICONS = {
     shoutout:   '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.3L10 14.5l-4.9 2.5.9-5.3-4-3.9 5.6-.8z"/></svg>',
     shift:      '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l2.5 2.5"/></svg>',
@@ -700,9 +714,10 @@
   /* ═══════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════ */
-  var allSubmissions = [];
-  var currentFilter  = 'all';
-  var unsubscribe    = null;
+  var allSubmissions  = [];
+  var currentFilter   = 'all';
+  var currentLocation = 'all';
+  var unsubscribe     = null;
 
   /* ═══════════════════════════════════════════
      UTILITIES
@@ -799,6 +814,10 @@
     var html = '';
     var cat  = data.category;
 
+    if (data.location) {
+      html += field('Location', LOCATION_LABELS[data.location] || data.location);
+    }
+
     if (cat === 'shoutout') {
       html += field('Recognized', data.who);
       html += field('For', data.what);
@@ -876,9 +895,10 @@
     var i;
 
     for (i = 0; i < allSubmissions.length; i++) {
-      if (currentFilter === 'all' || allSubmissions[i].category === currentFilter) {
-        filtered.push(allSubmissions[i]);
-      }
+      var s = allSubmissions[i];
+      var catMatch  = currentFilter   === 'all' || s.category === currentFilter;
+      var locMatch  = currentLocation === 'all' || s.location === currentLocation;
+      if (catMatch && locMatch) { filtered.push(s); }
     }
 
     if (filtered.length === 0) {
@@ -987,14 +1007,23 @@
       auth.signOut();
     });
 
-    /* Filter tabs */
-    var filterBtns = document.querySelectorAll('.filter-btn');
+    /* Category filter tabs */
+    var filterBtns = document.querySelectorAll('.filter-row:first-of-type .filter-btn');
     Array.prototype.forEach.call(filterBtns, function(btn) {
       btn.addEventListener('click', function() {
         currentFilter = btn.getAttribute('data-filter');
-        Array.prototype.forEach.call(filterBtns, function(b) {
-          b.classList.remove('active');
-        });
+        Array.prototype.forEach.call(filterBtns, function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderFeed();
+      });
+    });
+
+    /* Location filter tabs */
+    var locationBtns = document.querySelectorAll('#locationFilterRow .filter-btn');
+    Array.prototype.forEach.call(locationBtns, function(btn) {
+      btn.addEventListener('click', function() {
+        currentLocation = btn.getAttribute('data-location');
+        Array.prototype.forEach.call(locationBtns, function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
         renderFeed();
       });
