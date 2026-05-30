@@ -6,7 +6,7 @@ service cloud.firestore {
       // Anyone (staff) can create a submission — no login required
       allow create: if
         request.resource.data.keys().hasAll(['category', 'timestamp']) &&
-        request.resource.data.category is string &&
+        request.resource.data.category in ['shift', 'shoutout', 'suggestion', 'concern'] &&
         request.resource.data.timestamp is string;
 
       // Only signed-in admins can read submissions

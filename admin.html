@@ -609,7 +609,7 @@
       <span class="live-label"><span class="live-dot"></span>Live</span>
     </div>
 
-    <div class="filter-row">
+    <div class="filter-row" id="categoryFilterRow">
       <button class="filter-btn active" data-filter="all"        type="button">All</button>
       <button class="filter-btn"        data-filter="shoutout"   type="button">Shout-Outs</button>
       <button class="filter-btn"        data-filter="shift"      type="button">Shifts</button>
@@ -1008,7 +1008,7 @@
     });
 
     /* Category filter tabs */
-    var filterBtns = document.querySelectorAll('.filter-row:first-of-type .filter-btn');
+    var filterBtns = document.querySelectorAll('#categoryFilterRow .filter-btn');
     Array.prototype.forEach.call(filterBtns, function(btn) {
       btn.addEventListener('click', function() {
         currentFilter = btn.getAttribute('data-filter');
